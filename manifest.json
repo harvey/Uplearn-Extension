@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Uplearn Auto Quality",
-  "version": "3.0",
+  "version": "4.0",
   "description": "Saves your quality and custom speed changes on Uplearn.",
   
   "icons": {
@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://app.uplearn.co.uk/learn/*"],
+      "matches": ["https://*.uplearn.co.uk/learn/*"],
       "js": ["content.js"]
     }
   ],

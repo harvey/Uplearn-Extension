@@ -31,47 +31,59 @@ window.addEventListener("load", (event) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
-    sleep(2000).then(() => { 
+    sleep(2000).then(() => {
 
         var r = document.querySelectorAll('video')[0];
-        r.playbackRate = speed;
-        console.log('=== SPEED CHANGED ===')
-        
-        function waitForElement(selector, callback) {
-            var element = document.querySelector(selector);
-            if (element) {
-                callback(element);
-            } else {
-                setTimeout(function() {
-                    waitForElement(selector, callback);
-                }, 1);
+        if (r) {
+            r.playbackRate = speed;
+            console.log('=== SPEED CHANGED ===')
+            
+            function waitForElement(selector, callback) {
+                var element = document.querySelector(selector);
+                if (element) {
+                    callback(element);
+                } else {
+                    setTimeout(function() {
+                        waitForElement(selector, callback);
+                    }, 1); // Adjust the delay as needed
+                }
             }
-        }
-        
-        // First element
-        waitForElement('[data-handle="settingsButton_icon_wrapper"]', function(one) {
-            one.click();
-        
-            // Second element
-            waitForElement('[data-handle="quality"]', function(two) {
-                two.click();
-        
-                // Third element
-                let tempQual = '';
-
-                if (quality == 'Auto') {
-                    tempQual = 'Auto';
-                }
-                else {
-                    tempQual = `${quality}p`;
-                }
-
-                waitForElement(`[value="${tempQual}"]`, function(three) {
-                    three.click();
-                    console.log('after');
+            
+            // First element
+            waitForElement('[data-handle="settingsButton_icon_wrapper"]', function(one) {
+                one.click();
+            
+                // Second element
+                waitForElement('[data-handle="quality"]', function(two) {
+                    two.click();
+            
+                    // Third element
+                    let tempQual = '';
+    
+                    if (quality == 'Auto') {
+                        tempQual = 'Auto'
+                    }
+                    else {
+                        tempQual = `${quality}p`
+                    }
+    
+                    if (quality == 'Highest') {
+                        tableBox = document.getElementsByClassName('w-check-menu-body')[1].children
+                        tableBox[tableBox.length-1].children[1].click() // Click the highest quality in the quality box.
+                    }
+                    else {
+                        waitForElement(`[value="${tempQual}"]`, function(three) {
+                            three.click();
+                            console.log('after');
+                        });
+                    }
                     one.click()
                 });
             });
-        });
+        }
+        else
+        {
+            console.log('Taking too long to find video, assuming no videos on page.')
+        }
     });
 });
