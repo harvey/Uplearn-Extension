@@ -1,26 +1,26 @@
-window.addEventListener("load", (event) => {
-        let timeoutId;
-        console.log('Uplearn Auto Quality: Injecting content.js script')
-        chrome.runtime.onMessage.addListener(function(message) {
-            // Handle messages from the extension's popup
-            if (message.action === "updateQuality") {
-                // Update the value on the main page
-                localStorage.setItem('ulExtQuality', message.value);
-            }
-            if (message.action === "updateSpeed") {
-                // Update the value on the main page
-                localStorage.setItem('ulExtSpeed', message.value);
+function runScript() {
+    let timeoutId;
+    console.log('Uplearn Auto Quality: Injecting content.js script')
+    chrome.runtime.onMessage.addListener(function(message) {
+        // Handle messages from the extension's popup
+        if (message.action === "updateQuality") {
+            // Update the value on the main page
+            localStorage.setItem('ulExtQuality', message.value);
+        }
+        if (message.action === "updateSpeed") {
+            // Update the value on the main page
+            localStorage.setItem('ulExtSpeed', message.value);
 
-                // Clear the previous timeout
-                clearTimeout(timeoutId);
+            // Clear the previous timeout
+            clearTimeout(timeoutId);
 
-                // Set a new timeout
-                timeoutId = setTimeout(() => {
-                    var r = document.querySelectorAll('video')[0];
-                    r.playbackRate = message.value;
-                }, 350);
-            }
-        });
+            // Set a new timeout
+            timeoutId = setTimeout(() => {
+                var r = document.querySelectorAll('video')[0];
+                r.playbackRate = message.value;
+            }, 350);
+        }
+    });
     
     
     quality = localStorage.getItem('ulExtQuality');
@@ -86,4 +86,54 @@ window.addEventListener("load", (event) => {
             console.log('Taking too long to find video, assuming no videos on page.')
         }
     });
+}
+
+window.addEventListener("load", () => {
+    runScript();
+})
+
+// chatGPT generated jargon
+
+// Monitor for URL changes 
+// (bug with code not running properly 
+// when it doens't detect a page update)
+let lastUrl = location.href;
+new MutationObserver(() => {
+    const currentUrl = location.href;
+    if (currentUrl !== lastUrl) {
+        lastUrl = currentUrl;
+        runScript();
+    }
+}).observe(document, { subtree: true, childList: true });
+
+// Listen for back/forward navigation
+window.addEventListener('popstate', () => {
+    runScript();
 });
+
+// Override pushState and replaceState to detect URL changes
+(function(history) {
+    const pushState = history.pushState;
+    const replaceState = history.replaceState;
+
+    history.pushState = function(...args) {
+        const result = pushState.apply(history, args);
+        window.dispatchEvent(new Event('pushstate'));
+        return result;
+    };
+
+    history.replaceState = function(...args) {
+        const result = replaceState.apply(history, args);
+        window.dispatchEvent(new Event('replacestate'));
+        return result;
+    };
+
+    window.addEventListener('pushstate', () => {
+        runScript();
+    });
+
+    window.addEventListener('replacestate', () => {
+        runScript();
+    });
+
+})(window.history);
