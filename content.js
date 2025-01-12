@@ -204,7 +204,7 @@ function runScript() {
             }
         }
         if (message.action === 'updateThemeChanger') {
-            alert(message.value);
+            //alert(message.value);
             localStorage.setItem('ulExtThemeChanger', message.value)
             updateMainPageTheme(localStorage.getItem('ulExtTheme'));
         }
