@@ -61,27 +61,28 @@ document.addEventListener("DOMContentLoaded", function() {
         return (key >= '0' && key <= '9') || ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'x', 'X', '.', 'Ctrl', 'a'].includes(key);
     }
 
-    qual = localStorage.getItem('ulExtQuality')
-    sped = localStorage.getItem('ulExtSpeed')
-    them = localStorage.getItem('ulExtTheme')
+    qual = localStorage.getItem('ulExtQuality');
+    sped = localStorage.getItem('ulExtSpeed');
+    them = localStorage.getItem('ulExtTheme');
+    themeEnabled = localStorage.getItem('ulExtThemeEnabled');
 
     if (!qual)
     {
-        localStorage.setItem('ulExtQuality', 'Auto')
+        localStorage.setItem('ulExtQuality', 'Auto');
     }
 
     if (!sped)
     {
-        localStorage.setItem('ulExtSpeed', '1.00')
+        localStorage.setItem('ulExtSpeed', '1.00');
     }
 
     
     var qualityInput = document.getElementById("quality");
-    qualityInput.value = localStorage.getItem('ulExtQuality')
+    qualityInput.value = localStorage.getItem('ulExtQuality');
 
     // Add event listener for the input event
     qualityInput.addEventListener("input", function(event) {
-        localStorage.setItem('ulExtQuality', qualityInput.value)
+        localStorage.setItem('ulExtQuality', qualityInput.value);
         // When the input value is updated, send a message to the content script
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, { action: "updateQuality", value: qualityInput.value });
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     
     const sliderValue = document.getElementById('sliderValue');
-    slider.value = localStorage.getItem('ulExtSpeed')
+    slider.value = localStorage.getItem('ulExtSpeed');
     sliderValue.innerText = `${slider.value}x`;
 
     slider.addEventListener('input', function() {
@@ -99,6 +100,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     slider.addEventListener('mouseup', function() {
         sendSpeed();
+    })
+
+    let themeToggle = document.getElementById('themeToggler');
+    themeToggle.addEventListener('change', function() {
+        updateTheme();
+    })
+
+
+    let themeToggleEnabled = document.getElementById('enabledTheme');
+    themeToggleEnabled.addEventListener('change', function() {
+        toggleThemeChanger();
     })
 
     function updateSlider(slider) {
@@ -116,5 +128,41 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    function toggleThemeChanger() {
+        let enabled = document.getElementById('enabledTheme').checked.toString();
+        localStorage.setItem('ulExtThemeChanger', enabled);
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "updateThemeChanger", value: enabled });
+        });
+    }
+
     
+
+    function updateTheme() {
+        let themeToggle = document.getElementById('themeToggler');
+
+        if(themeToggle) {
+            localStorage.setItem('ulExtTheme', themeToggle.checked.toString());
+        }
+        else{
+            localStorage.setItem('ulExtTheme', 'false');
+        }
+
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "updateTheme", value: localStorage.getItem('ulExtTheme') });
+        });
+    }
+
+
+
+    function correctCheckBox() {
+        if (localStorage.getItem('ulExtTheme') == 'true'){
+            themeToggle.checked = true;
+        }
+        if (localStorage.getItem('ulExtThemeChanger') == 'true'){
+            themeToggleEnabled.checked = true;
+        }
+    }
+
+    correctCheckBox();
 });
