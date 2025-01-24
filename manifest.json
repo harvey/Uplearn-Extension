@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Uplearn Auto Quality",
-  "version": "6.0",
-  "description": "Saves your quality and custom speed changes on Uplearn.",
+  "name": "Uplearn Custom Speed",
+  "version": "6.1",
+  "description": "Saves your custom speed changes on Uplearn.",
   
   "icons": {
     "512": "icon.png"
