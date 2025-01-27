@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Uplearn Custom Speed",
-  "version": "7.0",
+  "version": "7.1",
   "description": "Saves your custom speed changes on Uplearn.",
   
   "icons": {
