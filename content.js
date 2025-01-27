@@ -37,6 +37,47 @@ function runScript() {
         if (r) {
             r.playbackRate = speed;
             console.log('=== SPEED CHANGED ===')
+
+            // track the amount of time saved
+
+            let lastPlaybackRate = speed;
+            let lastUpdateTime = Date.now();
+
+            const video = document.querySelector("video");
+
+            if (video) {
+                // Monitor playback rate changes
+                const trackTimeSaved = () => {
+                    const currentTime = Date.now();
+                    const elapsedTime = (currentTime - lastUpdateTime) / 1000;
+
+                    if (video.playbackRate > 1) {
+                        // Calculate saved time during this interval
+                        const savedTime = elapsedTime * (video.playbackRate - 1);
+
+                        // Send the saved time to the background script
+                        chrome.runtime.sendMessage({ type: "updateSavedTime", savedTime }, (response) => {
+                            if (response.status === "success") {
+                                console.log(`Saved time sent: ${savedTime.toFixed(2)} seconds`);
+                            }
+                        });
+                    }
+
+                    // Update the last update time
+                    lastUpdateTime = currentTime;
+                    lastPlaybackRate = video.playbackRate;
+                };
+
+                // Track playback rate changes
+                video.addEventListener("ratechange", trackTimeSaved);
+
+                // Also track time saved every second while the video is playing
+                setInterval(() => {
+                    if (!video.paused) {
+                        trackTimeSaved();
+                    }
+                }, 1000);
+            }
         }
         else { console.log('Taking too long to find video, assuming no videos on page.')}
     });
